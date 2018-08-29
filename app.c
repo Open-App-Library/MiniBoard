@@ -93,15 +93,23 @@ draw_brush (GtkWidget *widget,
   cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
   cairo_set_line_width(cr, brush_size_value);
 
-  cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
+  //cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
+
+  if (last_draw_x == -1 || last_draw_y == -1) {
+    cairo_move_to(cr, x, y);
+  } else {
+    cairo_move_to(cr, last_draw_x, last_draw_y);
+  }
+
+  cairo_line_to(cr, x, y);
 
   last_draw_x = x;
   last_draw_y = y;
 
-  cairo_fill(cr);
+  //cairo_fill(cr);
+  cairo_stroke(cr);
 
   cairo_destroy (cr);
-
   /* Now invalidate the affected region of the drawing area. */
   gtk_widget_queue_draw_area (widget, 0, 0, 1000, 1000);
 
