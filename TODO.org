@@ -1,0 +1,5 @@
+* TODO If mouse release, set last_draw_x and last_draw_y to -1
+* TODO Fix bug where stylus hover draws
+* TODO Basic functionality: Brush size, color, saving, opening
+* TODO Multi-touch gestures: Pinch to zoom and panning.
+* TODO Advanced multi-touch gestures: Rotating canvas

@@ -75,15 +75,28 @@ draw_brush (GtkWidget *widget,
   /* Paint to the surface, where we store our state */
   cr = cairo_create (surface);
 
-  int brush_size_value = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(brush_size)) * 5;
+  /* int brush_size_value = (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(brush_size)) * 5; */
 
-  cairo_rectangle (cr, x - 3, y - 3, brush_size_value, brush_size_value);
-  cairo_fill (cr);
+  /* cairo_rectangle (cr, x - 3, y - 3, brush_size_value, brush_size_value); */
+  /* cairo_fill (cr); */
+
+  if (last_draw_x == -1 || last_draw_y == -1) {
+    cairo_move_to(cr, x, y);
+  } else {
+    cairo_move_to(cr, last_draw_x, last_draw_y);
+  }
+
+  last_draw_x = x;
+  last_draw_y = y;
+
+  cairo_line_to(cr, x, y);
+  cairo_stroke(cr);
 
   cairo_destroy (cr);
 
   /* Now invalidate the affected region of the drawing area. */
-  gtk_widget_queue_draw_area (widget, x - 3, y - 3, brush_size_value, brush_size_value);
+  gtk_widget_queue_draw_area (widget, 0, 0, 1000, 1000);
+
 }
 
 /* Handle button press events by either drawing a rectangle
@@ -171,6 +184,8 @@ int main (int argc, char **argv) {
                     G_CALLBACK (motion_notify_event_cb), NULL);
   g_signal_connect (drawing_area, "button-press-event",
                     G_CALLBACK (button_press_event_cb), NULL);
+  g_signal_connect (drawing_area, "button-release-event",
+                    G_CALLBACK (button_release_event_cb), NULL);
 
   /* Ask to receive events the drawing area doesn't normally
    * subscribe to. In particular, we need to ask for the
