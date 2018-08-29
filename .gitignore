@@ -1,6 +1,10 @@
-# Emacs-Related Ignores #
+# Emacs-Related ignores #
 *#
 *~
 
-# Project-Related Ignore #
+# Project-Related ignores #
 MiniBoard
+
+
+# C-related ignores #
+compile_commands.json
