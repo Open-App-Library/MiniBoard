@@ -1,6 +1,8 @@
 MiniBoard
 ---
 
+![Screenshot](screenshot.png)
+
 A minimal linux application for drawing and note-taking. It is designed for touch devices but should work just as well with drawing tablets too.
 
 This app **will** support:
