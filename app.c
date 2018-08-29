@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <gtk/gtk.h>
 
 GtkBuilder *builder;
@@ -92,17 +93,12 @@ draw_brush (GtkWidget *widget,
   cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
   cairo_set_line_width(cr, brush_size_value);
 
-  if (last_draw_x == -1 || last_draw_y == -1) {
-    cairo_move_to(cr, x, y);
-  } else {
-    cairo_move_to(cr, last_draw_x, last_draw_y);
-  }
+  cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
 
   last_draw_x = x;
   last_draw_y = y;
 
-  cairo_line_to(cr, x, y);
-  cairo_stroke(cr);
+  cairo_fill(cr);
 
   cairo_destroy (cr);
 
@@ -226,6 +222,8 @@ int main (int argc, char **argv) {
                     G_CALLBACK (button_press_event_cb), NULL);
 
   g_signal_connect (drawing_area, "button-release-event",
+                    G_CALLBACK (button_release_event_cb), NULL);
+  g_signal_connect (app_window, "button-release-event",
                     G_CALLBACK (button_release_event_cb), NULL);
 
   // UI Signals
