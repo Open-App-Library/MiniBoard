@@ -17,6 +17,8 @@ int brush_size_value = 5;
 int last_draw_x = -1;
 int last_draw_y = -1;
 
+int scale = 1;
+
 int canvas_width, canvas_height;
 
 /* Surface to store current scribbles */
@@ -58,6 +60,7 @@ configure_event_cb (GtkWidget           *widget,
 
   // TRANSFER OLD DATA TO NEW SURFACE
   cr = cairo_create (new_surface);
+  cairo_scale(cr, scale, scale);
   cairo_set_source_surface(cr, surface, 0, 0);
   cairo_paint(cr);
   cairo_destroy (cr);
@@ -79,6 +82,7 @@ draw_cb (GtkWidget *widget,
          gpointer     data)
 {
   cairo_set_source_surface (cr, surface, 0, 0);
+  cairo_scale(cr, 2, 2);
   cairo_paint (cr);
 
   return FALSE;
@@ -96,7 +100,7 @@ draw_brush (GtkWidget *widget,
   cr = cairo_create (surface);
 
   cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
-  // cairo_set_line_width(cr, brush_size_value);
+  // cairo_set_line_width(cr, brush_size_value)
 
   cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
 
@@ -120,7 +124,6 @@ draw_brush (GtkWidget *widget,
     }
   }
 
-
   last_draw_x = x;
   last_draw_y = y;
 
@@ -138,6 +141,31 @@ draw_brush (GtkWidget *widget,
  * The ::button-press signal handler receives a GdkEventButton
  * struct which contains this information.
  */
+static gboolean touch_event (GtkWidget      *widget,
+                             GdkEventTouchpadPinch *event,
+                             gpointer        data)
+{
+  //printf("x %f, y %f\n", event->dx, event->dy);
+  /* canvas_width = gtk_widget_get_allocated_width(drawing_area); */
+  /* canvas_height = gtk_widget_get_allocated_height(drawing_area); */
+
+  /* static cairo_surface_t *new_surface = NULL; */
+  /* new_surface = gdk_window_create_similar_surface(gtk_widget_get_window (widget), */
+  /*                                             CAIRO_CONTENT_COLOR, */
+  /*                                             canvas_width, */
+  /*                                             canvas_height); */
+  /* cairo_t *cr = cairo_create (new_surface); */
+  /* cairo_scale(cr, 0.5, 0.5); */
+  /* //cairo_translate(cr, canvas_width/2, 0); */
+  /* cairo_set_source_surface(cr, surface, 0, 0); */
+  /* cairo_paint(cr); */
+  /* cairo_destroy (cr); */
+  /* cairo_surface_destroy(surface); */
+  /* surface = new_surface; */
+  /* gtk_widget_queue_draw_area (drawing_area, 0, 0, canvas_width, canvas_height); */
+  return TRUE;
+}
+
 static gboolean
 button_press_event_cb (GtkWidget      *widget,
                        GdkEventButton *event,
@@ -252,7 +280,9 @@ int main (int argc, char **argv) {
   g_signal_connect (app_window, "button-release-event",
                     G_CALLBACK (button_release_event_cb), NULL);
 
-  // UI Signals
+  g_signal_connect (drawing_area, "touch-event",
+                    G_CALLBACK (touch_event), NULL);
+
   g_signal_connect(brush_size_widget, "changed",
                    G_CALLBACK(brush_size_changed), NULL);
   g_signal_connect(brush_color_widget, "color-set",
@@ -265,7 +295,8 @@ p   */
   gtk_widget_set_events (drawing_area, gtk_widget_get_events(drawing_area)
                                      | GDK_BUTTON_PRESS_MASK
                                      | GDK_BUTTON_RELEASE_MASK
-                                     | GDK_POINTER_MOTION_MASK);
+                                     | GDK_POINTER_MOTION_MASK
+                                     | GDK_TOUCH_MASK);
 
 
   gtk_widget_show_all(GTK_WIDGET(app_window));
