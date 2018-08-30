@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <gtk/gtk.h>
 
@@ -15,6 +16,8 @@ int brush_size_value = 5;
 
 int last_draw_x = -1;
 int last_draw_y = -1;
+
+int canvas_width, canvas_height;
 
 /* Surface to store current scribbles */
 static cairo_surface_t *surface = NULL;
@@ -40,10 +43,12 @@ configure_event_cb (GtkWidget           *widget,
                     gpointer           data)
 {
   static cairo_surface_t *new_surface = NULL;
+  canvas_width = gtk_widget_get_allocated_width(widget);
+  canvas_height = gtk_widget_get_allocated_height(widget);
   new_surface = gdk_window_create_similar_surface(gtk_widget_get_window (widget),
                                               CAIRO_CONTENT_COLOR,
-                                              gtk_widget_get_allocated_width (widget),
-                                              gtk_widget_get_allocated_height (widget));
+                                              canvas_width,
+                                              canvas_height);
   cairo_t *cr;
   // DRAW WHITE BACKGROUND
   cr = cairo_create (new_surface);
@@ -91,23 +96,36 @@ draw_brush (GtkWidget *widget,
   cr = cairo_create (surface);
 
   cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
-  cairo_set_line_width(cr, brush_size_value);
+  // cairo_set_line_width(cr, brush_size_value);
 
-  //cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
+  cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
 
-  if (last_draw_x == -1 || last_draw_y == -1) {
-    cairo_move_to(cr, x, y);
-  } else {
-    cairo_move_to(cr, last_draw_x, last_draw_y);
+  // DDA Algorithm
+  if (last_draw_x != -1 && last_draw_y != -1) {
+    int dx = x - last_draw_x;
+    int dy = y - last_draw_y;
+
+    int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+
+    float Xinc = dx / (float) steps;
+    float Yinc = dy / (float) steps;
+
+    float xindex = last_draw_x;
+    float yindex = last_draw_y;
+
+    for (int i = 0; i <= steps; i++) {
+      cairo_arc(cr, xindex, yindex, brush_size_value / 2, 0, 2 * M_PI);
+      xindex += Xinc;
+      yindex += Yinc;
+    }
   }
 
-  cairo_line_to(cr, x, y);
 
   last_draw_x = x;
   last_draw_y = y;
 
   //cairo_fill(cr);
-  cairo_stroke(cr);
+  cairo_fill(cr);
 
   cairo_destroy (cr);
   /* Now invalidate the affected region of the drawing area. */
