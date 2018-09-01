@@ -3,6 +3,7 @@
 *~
 
 # Project-Related ignores #
+build/
 MiniBoard
 
 

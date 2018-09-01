@@ -25,7 +25,7 @@ void destroy_canvas()
 
 gboolean canvas_exists()
 {
-  return canvas ? true : false;
+  return canvas ? TRUE : FALSE;
 }
 
 gboolean
@@ -59,7 +59,6 @@ configure_event_cb (GtkWidget         *widget,
 
   // TRANSFER OLD DATA TO NEW CANVAS
   cr = cairo_create (new_canvas);
-  cairo_scale(cr, scale, scale);
   cairo_set_source_surface(cr, canvas, 0, 0);
   cairo_paint(cr);
   cairo_destroy (cr);

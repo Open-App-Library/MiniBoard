@@ -23,10 +23,10 @@ int get_canvas_height()
   return 1000;
 }
 
-void init_gui(int argc, char **argv) {
-  gtk_init(&argc, &argv);
+int init_gui(int *argc, char ***argv) {
+  gtk_init(argc, argv);
 
-  builder = gtk_builder_new_from_file("design.glade");
+  builder = gtk_builder_new_from_resource("/io/dougie/miniboard/src/design.glade");
 
   app_window = gtk_builder_get_object(builder, "app_window");
   g_signal_connect (app_window, "destroy", G_CALLBACK (close_window), NULL);
@@ -55,9 +55,6 @@ void init_gui(int argc, char **argv) {
                     G_CALLBACK (button_release_event_cb), NULL);
   g_signal_connect (app_window, "button-release-event",
                     G_CALLBACK (button_release_event_cb), NULL);
-
-  g_signal_connect (drawing_area, "touch-event",
-                    G_CALLBACK (touch_event), NULL);
 
   g_signal_connect(brush_size_widget, "changed",
                    G_CALLBACK(brush_size_changed), NULL);
@@ -93,7 +90,7 @@ gboolean button_press_event_cb (GtkWidget      *widget,
   if (event->button == GDK_BUTTON_PRIMARY) {
     draw_brush(widget, event->x, event->y);
   } else if (event->button == GDK_BUTTON_SECONDARY) {
-    clear_surface();
+    clear_canvas();
     gtk_widget_queue_draw(widget);
   }
 
@@ -116,7 +113,7 @@ motion_notify_event_cb (GtkWidget        *widget,
                         gpointer        data)
 {
   /* paranoia check, in case we haven't gotten a configure event */
-  if (surface == NULL)
+  if (get_canvas() == NULL)
     return FALSE;
 
   if (event->state & GDK_BUTTON1_MASK)
@@ -138,7 +135,7 @@ gboolean brush_color_changed (GtkWidget      *widget,
                                      GdkEventButton *event,
                                      gpointer        data)
 {
-  GdkRGBA *chosen_color;
+  GdkRGBA chosen_color;
   gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &brush_color_value);
   set_brush_color(chosen_color);
   return TRUE;
@@ -147,7 +144,7 @@ gboolean brush_color_changed (GtkWidget      *widget,
 void close_window ()
 {
   if (get_canvas())
-    destroy_canvas()
+    destroy_canvas();
 
   gtk_main_quit();
 }

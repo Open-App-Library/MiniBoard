@@ -1,6 +1,0 @@
-#+title: WHERE I LEFT OFF
-
-I was compiling each file one-by-one to spot and remove errors.
-
-ex. gcc -c src/_main.c ...
-

@@ -17,11 +17,11 @@ int     get_brush_size();
 int get_canvas_width();
 int get_canvas_height();
 
-void init_gui(int argc, char **argv);
+int init_gui(int *argc, char ***argv);
 
 gboolean button_press_event_cb (GtkWidget        *widget,
                                 GdkEventButton   *event,
-                                gpointer          data)
+                                gpointer          data);
 
 gboolean button_release_event_cb (GtkWidget      *widget,
                                   GdkEventButton *event,

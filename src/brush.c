@@ -1,15 +1,18 @@
 #include <math.h>
+#include <stdio.h>
 #include <gtk/gtk.h>
 
 #include "brush.h"
 #include "canvas.h"
 
+int last_draw_x = -1;
+int last_draw_y = -1;
 
 void set_brush_size(int brush_size) {
   brush_size_value = brush_size;
 }
 
-void set_brush_color(GdkRGBA *brush_color) {
+void set_brush_color(GdkRGBA brush_color) {
   brush_color_value = brush_color;
 }
 
@@ -56,6 +59,7 @@ void draw_brush (GtkWidget *widget,
 }
 
 void stroke_release() {
+  printf("Releasing Stroke.\n");
   last_draw_x = -1;
   last_draw_y = -1;
 }
