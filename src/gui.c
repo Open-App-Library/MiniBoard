@@ -26,7 +26,7 @@ int get_canvas_height()
 int init_gui(int *argc, char ***argv) {
   gtk_init(argc, argv);
 
-  builder = gtk_builder_new_from_resource("/io/dougie/miniboard/src/design.glade");
+  builder = gtk_builder_new_from_resource("/io/dougie/miniboard/design.glade");
 
   app_window = gtk_builder_get_object(builder, "app_window");
   g_signal_connect (app_window, "destroy", G_CALLBACK (close_window), NULL);

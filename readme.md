@@ -16,24 +16,14 @@ This uses Gtk+3 and Cairo. Compile using `make compile` and run using `make run`
 
 ## How to Compile
 
-First, compile the user interface
+Compile the entire project using the following command:
 
 ```
-glib-compile-resources miniboard.gresource.xml --target=src/resources.c --generate-source
-```
-
-Next, run cmake
-
-```
-mkcd build
-cd build
-cmake ..
-```
-
-After that, cd into the newly created build folder and run `make`.
-
-```
-cd build
 make
 ```
 
+Run the project using the following command:
+
+```
+make run
+```

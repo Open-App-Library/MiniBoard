@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/io/dougie/miniboard">
-    <file preprocess="xml-stripblanks">src/design.glade</file>
+    <file preprocess="xml-stripblanks">design.glade</file>
   </gresource>
 </gresources>

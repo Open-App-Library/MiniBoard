@@ -1,9 +1,14 @@
-C_FILES=src/_main.c src/brush.c src/canvas.c src/gui.c
+all: compile-ui cmake compile-project
 
-all: compile run
+compile-ui:
+	glib-compile-resources miniboard.gresource.xml --target=src/resources.c --generate-source
 
-compile:
-	gcc $(C_FILES) `pkg-config gtk+-3.0 --cflags --libs` -o MiniBoard
+cmake:
+	mkdir -p build
+	cd build; cmake ..
+
+compile-project:
+	cd build; make
 
 run:
-	./MiniBoard
+	./build/src/MiniBoard

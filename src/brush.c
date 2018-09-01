@@ -59,7 +59,6 @@ void draw_brush (GtkWidget *widget,
 }
 
 void stroke_release() {
-  printf("Releasing Stroke.\n");
   last_draw_x = -1;
   last_draw_y = -1;
 }
