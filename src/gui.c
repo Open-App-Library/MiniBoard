@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "gui.h"
 #include "canvas.h"
 #include "brush.h"
@@ -61,10 +62,13 @@ int init_gui(int *argc, char ***argv) {
   g_signal_connect(brush_color_widget, "color-set",
                    G_CALLBACK(brush_color_changed), NULL);
 
+  g_signal_connect(drawing_area, "scale-changed",
+                   G_CALLBACK(gesture_zoom_event), NULL);
+
   /* Ask to receive events the drawing area doesn't normally
    * subscribe to. In particular, we need to ask for the
    * button press and motion notify events that want to handle.
-p   */
+   */
   gtk_widget_set_events (drawing_area, gtk_widget_get_events(drawing_area)
                                      | GDK_BUTTON_PRESS_MASK
                                      | GDK_BUTTON_RELEASE_MASK
@@ -120,6 +124,15 @@ motion_notify_event_cb (GtkWidget        *widget,
     draw_brush (widget, event->x, event->y);
 
   /* We've handled it, stop processing */
+  return TRUE;
+}
+
+gboolean gesture_zoom_event (GtkWidget      *widget,
+                             GtkGestureZoom *event,
+                             gpointer        data)
+{
+  puts("You zoomed!");
+
   return TRUE;
 }
 

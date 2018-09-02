@@ -12,3 +12,7 @@ compile-project:
 
 run:
 	./build/src/MiniBoard
+
+compile-and-run: compile-project run
+
+compile-everything-and-run: all run

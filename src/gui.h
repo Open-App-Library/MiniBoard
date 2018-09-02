@@ -31,6 +31,10 @@ gboolean motion_notify_event_cb (GtkWidget      *widget,
                                  GdkEventMotion *event,
                                  gpointer        data);
 
+gboolean gesture_zoom_event (GtkWidget      *widget,
+                             GtkGestureZoom *event,
+                             gpointer        data);
+
 gboolean brush_size_changed (GtkWidget      *widget,
                              GdkEventButton *event,
                              gpointer        data);
