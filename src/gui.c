@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "gui.h"
 #include "canvas.h"
 #include "brush.h"
@@ -24,12 +25,22 @@ int get_canvas_height()
   return 1000;
 }
 
+GtkWidget *get_canvas_widget()
+{
+  return drawing_area;
+}
+
+GtkWidget *get_window_widget()
+{
+  return app_window;
+}
+
 int init_gui(int *argc, char ***argv) {
   gtk_init(argc, argv);
 
   builder = gtk_builder_new_from_resource("/io/dougie/miniboard/design.glade");
 
-  app_window = gtk_builder_get_object(builder, "app_window");
+  app_window = GTK_WIDGET(gtk_builder_get_object(builder, "app_window"));
   g_signal_connect (app_window, "destroy", G_CALLBACK (close_window), NULL);
 
   drawing_frame = GTK_WIDGET(gtk_builder_get_object(builder, "drawing_frame"));
@@ -62,7 +73,11 @@ int init_gui(int *argc, char ***argv) {
   g_signal_connect(brush_color_widget, "color-set",
                    G_CALLBACK(brush_color_changed), NULL);
 
-  g_signal_connect(drawing_area, "scale-changed",
+  // Pinch-to-zoom
+  GtkGesture *pinch = gtk_gesture_zoom_new(drawing_area);
+  gtk_event_controller_set_propagation_phase (GTK_EVENT_CONTROLLER(pinch),
+                                              GTK_PHASE_TARGET);
+  g_signal_connect(pinch, "scale-changed",
                    G_CALLBACK(gesture_zoom_event), NULL);
 
   /* Ask to receive events the drawing area doesn't normally
@@ -127,11 +142,15 @@ motion_notify_event_cb (GtkWidget        *widget,
   return TRUE;
 }
 
-gboolean gesture_zoom_event (GtkWidget      *widget,
-                             GtkGestureZoom *event,
-                             gpointer        data)
+gboolean gesture_zoom_event (GtkGestureZoom *controller,
+                             gdouble         scale,
+                             gpointer        user_data)
 {
-  puts("You zoomed!");
+  gdouble x,y;
+  gtk_gesture_get_bounding_box_center(GTK_GESTURE(controller), &x, &y);
+
+  scale_canvas(scale, x, y);
+
 
   return TRUE;
 }

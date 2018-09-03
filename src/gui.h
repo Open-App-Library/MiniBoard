@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 
 static GtkBuilder *builder;
-static GObject    *app_window;
+static GtkWidget  *app_window;
 static GtkWidget  *drawing_frame;
 static GtkWidget  *drawing_area;
 static GtkWidget  *button_new_widget; // For creating new drawings
@@ -16,6 +16,9 @@ int     get_brush_size();
 
 int get_canvas_width();
 int get_canvas_height();
+
+GtkWidget *get_window_widget();
+GtkWidget *get_canvas_widget();
 
 int init_gui(int *argc, char ***argv);
 
@@ -31,9 +34,9 @@ gboolean motion_notify_event_cb (GtkWidget      *widget,
                                  GdkEventMotion *event,
                                  gpointer        data);
 
-gboolean gesture_zoom_event (GtkWidget      *widget,
-                             GtkGestureZoom *event,
-                             gpointer        data);
+gboolean gesture_zoom_event (GtkGestureZoom *controller,
+                             gdouble         scale,
+                             gpointer        user_data);
 
 gboolean brush_size_changed (GtkWidget      *widget,
                              GdkEventButton *event,

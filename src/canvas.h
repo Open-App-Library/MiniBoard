@@ -3,8 +3,6 @@
 
 #include <gtk/gtk.h>
 
-static cairo_surface_t *canvas = NULL;
-
 #include "canvas.h"
 #include "gui.h"
 
@@ -13,6 +11,8 @@ cairo_surface_t *get_canvas();
 void clear_canvas();
 
 void destroy_canvas();
+
+void scale_canvas(gdouble scale, gdouble x, gdouble y);
 
 gboolean canvas_exists();
 
