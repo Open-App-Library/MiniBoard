@@ -164,11 +164,11 @@ gboolean brush_size_changed (GtkWidget      *widget,
 }
 
 gboolean brush_color_changed (GtkWidget      *widget,
-                                     GdkEventButton *event,
-                                     gpointer        data)
+                              GdkEventButton *event,
+                              gpointer        data)
 {
   GdkRGBA chosen_color;
-  gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &brush_color_value);
+  gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &chosen_color);
   set_brush_color(chosen_color);
   return TRUE;
 }
