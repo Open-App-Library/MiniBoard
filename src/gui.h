@@ -35,6 +35,16 @@ gboolean gesture_zoom_event (GtkGestureZoom *controller,
                              gdouble         scale,
                              gpointer        user_data);
 
+void
+gesture_begin (GtkGesture       *gesture,
+               GdkEventSequence *sequence,
+               gpointer          user_data);
+
+void
+gesture_end (GtkGesture       *gesture,
+               GdkEventSequence *sequence,
+             gpointer          user_data);
+
 gboolean brush_size_changed (GtkWidget      *widget,
                              GdkEventButton *event,
                              gpointer        data);

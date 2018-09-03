@@ -65,10 +65,14 @@ int init_gui(int *argc, char ***argv) {
 
   // Pinch-to-zoom
   GtkGesture *pinch = gtk_gesture_zoom_new(drawing_area);
-  gtk_event_controller_set_propagation_phase (GTK_EVENT_CONTROLLER(pinch),
+  gtk_event_controller_set_propagation_phase  (GTK_EVENT_CONTROLLER(pinch),
                                               GTK_PHASE_TARGET);
   g_signal_connect(pinch, "scale-changed",
                    G_CALLBACK(gesture_zoom_event), NULL);
+  g_signal_connect(pinch, "begin",
+                   G_CALLBACK(gesture_begin), NULL);
+  g_signal_connect(pinch, "end",
+                   G_CALLBACK(gesture_end), NULL);
 
   /* Ask to receive events the drawing area doesn't normally
    * subscribe to. In particular, we need to ask for the
@@ -100,7 +104,6 @@ gboolean button_press_event_cb (GtkWidget      *widget,
     draw_brush(widget, event->x, event->y);
   } else if (event->button == GDK_BUTTON_SECONDARY) {
     /* clear_canvas(); */
-    scale_canvas(1.5, 0, 0);
     gtk_widget_queue_draw(widget);
   }
 
@@ -142,8 +145,23 @@ gboolean gesture_zoom_event (GtkGestureZoom *controller,
 
   scale_canvas(scale, x, y);
 
-
   return TRUE;
+}
+
+void
+gesture_begin (GtkGesture       *gesture,
+               GdkEventSequence *sequence,
+               gpointer          user_data)
+{
+  set_allowed_to_draw(FALSE);
+}
+
+void
+gesture_end (GtkGesture       *gesture,
+               GdkEventSequence *sequence,
+               gpointer          user_data)
+{
+  set_allowed_to_draw(TRUE);
 }
 
 gboolean brush_size_changed (GtkWidget      *widget,

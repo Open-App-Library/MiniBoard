@@ -11,11 +11,9 @@ cairo_surface_t *get_source_canvas();
 cairo_surface_t *get_user_canvas();
 
 int get_source_canvas_width();
-
 int get_source_canvas_height();
 
 int get_user_canvas_width();
-
 int get_user_canvas_height();
 
 cairo_surface_t *new_canvas();
@@ -32,6 +30,9 @@ void scale_canvas(gdouble scale, gdouble x, gdouble y);
 
 gboolean source_canvas_exists();
 gboolean user_canvas_exists();
+
+gboolean allowed_to_draw();
+void     set_allowed_to_draw(gboolean bool);
 
 gboolean
 draw_cb (GtkWidget *widget,

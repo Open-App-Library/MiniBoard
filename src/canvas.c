@@ -1,16 +1,23 @@
+#define CANVAS_WIDTH 1080
+#define CANVAS_HEIGHT 720
+
 #include "canvas.h"
 #include "gui.h"
 
 #include <gtk/gtk.h>
 
 /* The source canvas is unaltered and the complete drawing the user is working on */
-static cairo_surface_t *source_canvas = NULL;
+cairo_surface_t *source_canvas = NULL;
 /* The user canvas is what the user sees on their screen. When they edit, they are
  * editing both the source canvas and the user canvas. The user canvas will also
  * be scaled and altered.*/
-static cairo_surface_t *user_canvas = NULL;
+cairo_surface_t *user_canvas = NULL;
 
 gdouble current_zoom = 1.0; // Current zoom/scale of the canvas
+int     x_offset     = 0;
+int     y_offset     = 0;
+
+gboolean forbid_drawing = FALSE;
 
 cairo_surface_t *get_source_canvas()
 {
@@ -90,22 +97,11 @@ void destroy_canvases()
 
 void scale_canvas(gdouble scale, gdouble x, gdouble y)
 {
+  /* current_zoom = current_zoom + scale > 0 ? scale : 0.2; // If using scale delta */
   current_zoom = scale;
-  /* user_canvas = new_canvas(); */
+  x_offset = x - CANVAS_WIDTH * scale * (x / get_user_canvas_width());
+  y_offset = y - CANVAS_HEIGHT * scale * (y / get_user_canvas_height());
 
-  /* cairo_t *cr = cairo_create(user_canvas); */
-
-  /* cairo_scale(cr, scale, scale); */
-  /* current_zoom = scale; */
-
-  /* cairo_set_source_surface(cr, source_canvas, 0, 0); */
-
-  /* //cairo_translate(cr, canvas_width/2, 0); */
-
-  /* cairo_paint(cr); */
-  /* cairo_destroy (cr); */
-  /* /\* cairo_surface_destroy(canvas); *\/ */
-  /* canvas = new_surface; */
   gtk_widget_queue_draw_area (get_canvas_widget(), 0, 0, get_user_canvas_width(), get_user_canvas_height());
 }
 
@@ -119,11 +115,22 @@ gboolean user_canvas_exists()
   return user_canvas ? TRUE : FALSE;
 }
 
+gboolean allowed_to_draw()
+{
+  return !forbid_drawing;
+}
+
+void set_allowed_to_draw(gboolean bool)
+{
+  forbid_drawing = !bool;
+}
+
 gboolean
 draw_cb (GtkWidget *widget,
          cairo_t   *cr,
          gpointer     data)
 {
+  cairo_translate(cr, x_offset, y_offset);
   cairo_scale(cr, current_zoom, current_zoom);
   cairo_set_source_surface(cr, source_canvas, 0, 0);
   cairo_paint (cr);
@@ -139,8 +146,8 @@ configure_event_cb (GtkWidget         *widget,
   static cairo_surface_t *tmp_canvas;
   tmp_canvas = gdk_window_create_similar_surface(gtk_widget_get_window (widget),
                                                  CAIRO_CONTENT_COLOR,
-                                                 get_user_canvas_width(),
-                                                 get_user_canvas_height());
+                                                 CANVAS_WIDTH,
+                                                 CANVAS_HEIGHT);
   cairo_t *cr;
 
   // DRAW WHITE BACKGROUND
