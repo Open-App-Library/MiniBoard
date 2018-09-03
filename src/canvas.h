@@ -6,15 +6,32 @@
 #include "canvas.h"
 #include "gui.h"
 
-cairo_surface_t *get_canvas();
+cairo_surface_t *get_source_canvas();
 
-void clear_canvas();
+cairo_surface_t *get_user_canvas();
 
-void destroy_canvas();
+int get_source_canvas_width();
+
+int get_source_canvas_height();
+
+int get_user_canvas_width();
+
+int get_user_canvas_height();
+
+cairo_surface_t *new_canvas();
+
+cairo_surface_t *new_canvas_with_dimensions(int canvas_width, int canvas_height);
+
+void clear_specific_canvas(cairo_surface_t *canvas);
+
+void clear_canvas ();
+
+void destroy_canvases();
 
 void scale_canvas(gdouble scale, gdouble x, gdouble y);
 
-gboolean canvas_exists();
+gboolean source_canvas_exists();
+gboolean user_canvas_exists();
 
 gboolean
 draw_cb (GtkWidget *widget,

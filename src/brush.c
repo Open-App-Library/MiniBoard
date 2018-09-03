@@ -20,7 +20,7 @@ void draw_brush (GtkWidget *widget,
                  gdouble    x,
                  gdouble    y)
 {
-  cairo_t *cr = cairo_create(get_canvas());
+  cairo_t *cr = cairo_create(get_source_canvas());
 
   cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
 

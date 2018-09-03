@@ -15,16 +15,6 @@ int     get_brush_size()
   return brush_size_value;
 }
 
-int get_canvas_width()
-{
-  return 1000;
-}
-
-int get_canvas_height()
-{
-  return 1000;
-}
-
 GtkWidget *get_canvas_widget()
 {
   return drawing_area;
@@ -103,13 +93,14 @@ gboolean button_press_event_cb (GtkWidget      *widget,
                                 gpointer        data)
 {
   // paranoia check, in case we haven't gotten a configure event
-  if (get_canvas() == NULL)
+  if (get_source_canvas() == NULL)
     return FALSE;
 
   if (event->button == GDK_BUTTON_PRIMARY) {
     draw_brush(widget, event->x, event->y);
   } else if (event->button == GDK_BUTTON_SECONDARY) {
-    clear_canvas();
+    /* clear_canvas(); */
+    scale_canvas(1.5, 0, 0);
     gtk_widget_queue_draw(widget);
   }
 
@@ -132,7 +123,7 @@ motion_notify_event_cb (GtkWidget        *widget,
                         gpointer        data)
 {
   /* paranoia check, in case we haven't gotten a configure event */
-  if (get_canvas() == NULL)
+  if (get_source_canvas() == NULL)
     return FALSE;
 
   if (event->state & GDK_BUTTON1_MASK)
@@ -175,8 +166,8 @@ gboolean brush_color_changed (GtkWidget      *widget,
 
 void close_window ()
 {
-  if (get_canvas())
-    destroy_canvas();
+  if (get_source_canvas() || get_user_canvas())
+    destroy_canvases();
 
   gtk_main_quit();
 }

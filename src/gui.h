@@ -14,9 +14,6 @@ static GtkWidget  *brush_size_widget;
 GdkRGBA get_brush_color();
 int     get_brush_size();
 
-int get_canvas_width();
-int get_canvas_height();
-
 GtkWidget *get_window_widget();
 GtkWidget *get_canvas_widget();
 
