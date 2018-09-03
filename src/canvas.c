@@ -126,8 +126,10 @@ void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble 
   int anchor_point_x = (CANVAS_WIDTH * scale_value); // Scale from center
   int anchor_point_y = (CANVAS_HEIGHT * scale_value);
 
-  x_offset = get_user_canvas_width()  / 2 - anchor_point_x + x * scale_value;
-  y_offset = get_user_canvas_height() / 2 - anchor_point_y + y * scale_value;
+  /* x_offset = get_user_canvas_width()  / 2 - anchor_point_x + x * scale_value; */
+  /* y_offset = get_user_canvas_height() / 2 - anchor_point_y + y * scale_value; */
+  x_offset = get_user_canvas_width()  / 2 - CANVAS_WIDTH  * scale_value / 2; // zoom from center
+  y_offset = get_user_canvas_height() / 2 - CANVAS_HEIGHT * scale_value / 2;
 
   gtk_widget_queue_draw_area (get_canvas_widget(), 0, 0, get_user_canvas_width(), get_user_canvas_height());
 }
