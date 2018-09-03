@@ -16,6 +16,11 @@ int get_source_canvas_height();
 int get_user_canvas_width();
 int get_user_canvas_height();
 
+int get_canvas_x_offset();
+int get_canvas_y_offset();
+
+gdouble get_scale_value();
+
 cairo_surface_t *new_canvas();
 
 cairo_surface_t *new_canvas_with_dimensions(int canvas_width, int canvas_height);
@@ -27,6 +32,9 @@ void clear_canvas ();
 void destroy_canvases();
 
 void scale_canvas(gdouble scale, gdouble x, gdouble y);
+void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble y);
+
+void set_scale_value_on_release(gdouble last_scale);
 
 gboolean source_canvas_exists();
 gboolean user_canvas_exists();

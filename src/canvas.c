@@ -13,7 +13,8 @@ cairo_surface_t *source_canvas = NULL;
  * be scaled and altered.*/
 cairo_surface_t *user_canvas = NULL;
 
-gdouble current_zoom = 1.0; // Current zoom/scale of the canvas
+static gdouble scale_value = 1.0; // Current zoom/scale of the canvas
+
 int     x_offset     = 0;
 int     y_offset     = 0;
 
@@ -49,6 +50,20 @@ int get_user_canvas_width()
 int get_user_canvas_height()
 {
   return gtk_widget_get_allocated_height(get_canvas_widget());
+}
+
+int get_canvas_x_offset()
+{
+  return x_offset;
+}
+
+int get_canvas_y_offset()
+{
+  return y_offset;
+}
+
+gdouble get_scale_value() {
+  return scale_value;
 }
 
 /* Creates new canvas with height and width of the drawing area */
@@ -97,10 +112,22 @@ void destroy_canvases()
 
 void scale_canvas(gdouble scale, gdouble x, gdouble y)
 {
-  /* current_zoom = current_zoom + scale > 0 ? scale : 0.2; // If using scale delta */
-  current_zoom = scale;
-  x_offset = x - CANVAS_WIDTH * scale * (x / get_user_canvas_width());
-  y_offset = y - CANVAS_HEIGHT * scale * (y / get_user_canvas_height());
+  scale_value = scale;
+  /* x_offset = x - CANVAS_WIDTH * scale * (x / get_user_canvas_width()); */
+  /* y_offset = y - CANVAS_HEIGHT * scale * (y / get_user_canvas_height()); */
+
+  gtk_widget_queue_draw(get_canvas_widget());
+}
+
+void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble y)
+{
+  scale_value = scale_from * scale_to;
+
+  int anchor_point_x = (CANVAS_WIDTH * scale_value); // Scale from center
+  int anchor_point_y = (CANVAS_HEIGHT * scale_value);
+
+  x_offset = get_user_canvas_width()  / 2 - anchor_point_x + x * scale_value;
+  y_offset = get_user_canvas_height() / 2 - anchor_point_y + y * scale_value;
 
   gtk_widget_queue_draw_area (get_canvas_widget(), 0, 0, get_user_canvas_width(), get_user_canvas_height());
 }
@@ -131,7 +158,7 @@ draw_cb (GtkWidget *widget,
          gpointer     data)
 {
   cairo_translate(cr, x_offset, y_offset);
-  cairo_scale(cr, current_zoom, current_zoom);
+  cairo_scale(cr, scale_value, scale_value);
   cairo_set_source_surface(cr, source_canvas, 0, 0);
   cairo_paint (cr);
 

@@ -5,6 +5,10 @@
 #include "brush.h"
 
 #include <gtk/gtk.h>
+#include <glib/gprintf.h>
+
+static gdouble last_scale_value = 1.0;
+static gdouble current_scale_value = 1.0;
 
 GdkRGBA get_brush_color()
 {
@@ -143,7 +147,8 @@ gboolean gesture_zoom_event (GtkGestureZoom *controller,
   gdouble x,y;
   gtk_gesture_get_bounding_box_center(GTK_GESTURE(controller), &x, &y);
 
-  scale_canvas(scale, x, y);
+  scale_canvas_from(last_scale_value, scale, x, y);
+  current_scale_value = scale;
 
   return TRUE;
 }
@@ -158,9 +163,10 @@ gesture_begin (GtkGesture       *gesture,
 
 void
 gesture_end (GtkGesture       *gesture,
-               GdkEventSequence *sequence,
-               gpointer          user_data)
+             GdkEventSequence *sequence,
+             gpointer          user_data)
 {
+  last_scale_value *= current_scale_value;
   set_allowed_to_draw(TRUE);
 }
 
