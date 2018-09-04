@@ -16,8 +16,10 @@ int get_source_canvas_height();
 int get_user_canvas_width();
 int get_user_canvas_height();
 
-int get_canvas_x_offset();
-int get_canvas_y_offset();
+gdouble get_canvas_x_offset();
+gdouble get_canvas_y_offset();
+gdouble get_canvas_x_anchor();
+gdouble get_canvas_y_anchor();
 
 gdouble get_scale_value();
 
@@ -41,6 +43,11 @@ gboolean user_canvas_exists();
 
 gboolean allowed_to_draw();
 void     set_allowed_to_draw(gboolean bool);
+
+void set_x_start(gdouble num);
+void set_y_start(gdouble num);
+void set_x_stop();
+void set_y_stop();
 
 gboolean
 draw_cb (GtkWidget *widget,

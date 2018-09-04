@@ -26,6 +26,9 @@ void draw_brush (GtkWidget *widget,
 
     x-= get_canvas_x_offset();
     y-= get_canvas_y_offset();
+    x-= get_canvas_x_anchor();
+    y-= get_canvas_y_anchor();
+
     x/= get_scale_value();
     y/= get_scale_value();
 
@@ -64,7 +67,7 @@ void draw_brush (GtkWidget *widget,
 
       cairo_destroy (cr);
       /* Now invalidate the affected region of the drawing area. */
-      gtk_widget_queue_draw_area (widget, 0, 0, 1000, 1000);
+      gtk_widget_queue_draw_area (widget, x - 300, y - 300, x + 300, y + 300);
     }
   }
 }

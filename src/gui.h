@@ -31,7 +31,7 @@ gboolean motion_notify_event_cb (GtkWidget      *widget,
                                  GdkEventMotion *event,
                                  gpointer        data);
 
-gboolean gesture_zoom_event (GtkGestureZoom *controller,
+gboolean gesture_zoom_event (GtkGestureZoom *gesture,
                              gdouble         scale,
                              gpointer        user_data);
 

@@ -15,8 +15,14 @@ cairo_surface_t *user_canvas = NULL;
 
 static gdouble scale_value = 1.0; // Current zoom/scale of the canvas
 
-int     x_offset     = 0;
-int     y_offset     = 0;
+gdouble x_offset     = 0;
+gdouble y_offset     = 0;
+gdouble x_start      = 0;
+gdouble y_start      = 0;
+gdouble x_stop       = 0;
+gdouble y_stop       = 0;
+gdouble x_anchor     = 0;
+gdouble y_anchor     = 0;
 
 gboolean forbid_drawing = FALSE;
 
@@ -52,14 +58,24 @@ int get_user_canvas_height()
   return gtk_widget_get_allocated_height(get_canvas_widget());
 }
 
-int get_canvas_x_offset()
+gdouble get_canvas_x_offset()
 {
   return x_offset;
 }
 
-int get_canvas_y_offset()
+gdouble get_canvas_y_offset()
 {
   return y_offset;
+}
+
+gdouble get_canvas_x_anchor()
+{
+  return x_anchor;
+}
+
+gdouble get_canvas_y_anchor()
+{
+  return y_anchor;
 }
 
 gdouble get_scale_value() {
@@ -123,14 +139,13 @@ void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble 
 {
   scale_value = scale_from * scale_to;
 
-  int anchor_point_x = (CANVAS_WIDTH * scale_value); // Scale from center
-  int anchor_point_y = (CANVAS_HEIGHT * scale_value);
+  x_offset = x - x_start + x_stop;
+  y_offset = y - y_start + y_stop;
 
-  /* x_offset = get_user_canvas_width()  / 2 - anchor_point_x + x * scale_value; */
-  /* y_offset = get_user_canvas_height() / 2 - anchor_point_y + y * scale_value; */
-
-  x_offset = x - CANVAS_WIDTH * scale_value / 2; // zoom from center
-  y_offset = y - CANVAS_HEIGHT * scale_value / 2;
+  /* x_anchor = x - x * scale_value; */
+  /* y_anchor = y - y * scale_value; */
+  x_anchor = get_user_canvas_width() / 2 - CANVAS_WIDTH * scale_value / 2;
+  y_anchor = get_user_canvas_height() / 2 - CANVAS_HEIGHT * scale_value / 2;
 
   gtk_widget_queue_draw_area (get_canvas_widget(), 0, 0, get_user_canvas_width(), get_user_canvas_height());
 }
@@ -155,12 +170,30 @@ void set_allowed_to_draw(gboolean bool)
   forbid_drawing = !bool;
 }
 
+void set_x_start(gdouble num) {
+  x_start = num;
+}
+
+void set_y_start(gdouble num) {
+  y_start = num;
+}
+
+void set_x_stop(gdouble num) {
+  x_stop = x_offset;
+}
+
+void set_y_stop(gdouble num) {
+  y_stop = y_offset;
+}
+
 gboolean
 draw_cb (GtkWidget *widget,
          cairo_t   *cr,
          gpointer     data)
 {
-  cairo_translate(cr, x_offset, y_offset);
+  cairo_translate(cr,
+                  x_offset + x_anchor,
+                  y_offset + y_anchor);
   cairo_scale(cr, scale_value, scale_value);
   cairo_set_source_surface(cr, source_canvas, 0, 0);
   cairo_paint (cr);

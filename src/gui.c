@@ -140,12 +140,12 @@ motion_notify_event_cb (GtkWidget        *widget,
   return TRUE;
 }
 
-gboolean gesture_zoom_event (GtkGestureZoom *controller,
+gboolean gesture_zoom_event (GtkGestureZoom *gesture,
                              gdouble         scale,
                              gpointer        user_data)
 {
   gdouble x,y;
-  gtk_gesture_get_bounding_box_center(GTK_GESTURE(controller), &x, &y);
+  gtk_gesture_get_bounding_box_center(GTK_GESTURE(gesture), &x, &y);
 
   scale_canvas_from(last_scale_value, scale, x, y);
   current_scale_value = scale;
@@ -158,6 +158,12 @@ gesture_begin (GtkGesture       *gesture,
                GdkEventSequence *sequence,
                gpointer          user_data)
 {
+  gdouble x,y;
+  gtk_gesture_get_bounding_box_center(gesture, &x, &y);
+  set_x_start(x);
+  set_y_start(y);
+  printf("startx:%f\n", x);
+
   set_allowed_to_draw(FALSE);
 }
 
@@ -167,6 +173,9 @@ gesture_end (GtkGesture       *gesture,
              gpointer          user_data)
 {
   last_scale_value *= current_scale_value;
+
+  set_x_stop();
+  set_y_stop();
   set_allowed_to_draw(TRUE);
 }
 
