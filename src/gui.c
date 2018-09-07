@@ -5,7 +5,6 @@
 #include "brush.h"
 
 #include <gtk/gtk.h>
-#include <glib/gprintf.h>
 
 static GtkBuilder *builder;
 static GtkWidget  *app_window;
@@ -13,10 +12,18 @@ static GtkWidget  *drawing_frame;
 static GtkWidget  *drawing_area;
 static GtkWidget  *brush_color_widget;
 static GtkWidget  *brush_size_widget;
+
 static GtkWidget  *actions_menu;
+static GtkWidget  *new_button;
+static GtkWidget  *open_button;
+static GtkWidget  *save_button;
+static GtkWidget  *save_as_button;
+static GtkWidget  *eraser_toggle_button;
 
 static gdouble last_scale_value = 1.0;
 static gdouble current_scale_value = 1.0;
+
+static gchar *active_filename;
 
 GdkRGBA get_brush_color()
 {
@@ -49,6 +56,11 @@ int init_gui(int *argc, char ***argv) {
   brush_color_widget   = GTK_WIDGET(gtk_builder_get_object(builder, "brush_color"));
   brush_size_widget    = GTK_WIDGET(gtk_builder_get_object(builder, "brush_size"));
   actions_menu         = GTK_WIDGET(gtk_builder_get_object(builder, "actions_menu"));
+  new_button           = GTK_WIDGET(gtk_builder_get_object(builder, "new_button"));
+  open_button          = GTK_WIDGET(gtk_builder_get_object(builder, "open_button"));
+  save_button          = GTK_WIDGET(gtk_builder_get_object(builder, "save_button"));
+  save_as_button       = GTK_WIDGET(gtk_builder_get_object(builder, "save_as_button"));
+  eraser_toggle_button = GTK_WIDGET(gtk_builder_get_object(builder, "eraser_toggle_button"));
 
   drawing_area = gtk_drawing_area_new();
   gtk_container_add(GTK_CONTAINER(drawing_frame), drawing_area);
@@ -74,6 +86,11 @@ int init_gui(int *argc, char ***argv) {
                    G_CALLBACK(brush_size_changed), NULL);
   g_signal_connect(brush_color_widget, "color-set",
                    G_CALLBACK(brush_color_changed), NULL);
+
+  g_signal_connect(save_as_button, "clicked",
+                   G_CALLBACK(save_as_button_clicked), NULL);
+  g_signal_connect(save_button, "clicked",
+                   G_CALLBACK(save_button_clicked), NULL);
 
   // Pinch-to-zoom
   GtkGesture *pinch = gtk_gesture_zoom_new(drawing_area);
@@ -103,6 +120,53 @@ int init_gui(int *argc, char ***argv) {
 
   return 0;
 }
+
+gboolean save_as_button_clicked (GtkWidget      *widget,
+                                 GdkEventButton *event,
+                                 gpointer        data)
+{
+  GtkFileChooserNative *native;
+  GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_SAVE;
+  gint res;
+
+  native = gtk_file_chooser_native_new ("Open File",
+                                        GTK_WINDOW(app_window),
+                                        action,
+                                        "_Save",
+                                        "_Cancel");
+
+  res = gtk_native_dialog_run (GTK_NATIVE_DIALOG (native));
+  if (res == GTK_RESPONSE_ACCEPT)
+    {
+      char *filename;
+      GtkFileChooser *chooser = GTK_FILE_CHOOSER (native);
+      filename = gtk_file_chooser_get_filename (chooser);
+      filename = g_strconcat(filename, ".png", NULL);
+      active_filename = filename;
+      save_button_clicked(widget, event, data);
+
+      g_free (filename);
+    }
+
+  g_object_unref (native);
+
+
+  return TRUE;
+}
+
+gboolean save_button_clicked (GtkWidget      *widget,
+                              GdkEventButton *event,
+                              gpointer        data)
+{
+  if (!active_filename) {
+    save_as_button_clicked(widget, event, data);
+  } else {
+    cairo_surface_write_to_png(get_source_canvas(), active_filename);
+    printf("File saved to %s\n", active_filename);
+  }
+  return TRUE;
+}
+
 
 gboolean button_press_event_cb (GtkWidget      *widget,
                                 GdkEventButton *event,
@@ -173,7 +237,6 @@ gesture_begin (GtkGesture       *gesture,
   gtk_gesture_get_bounding_box_center(gesture, &x, &y);
   set_x_start(x);
   set_y_start(y);
-  printf("startx:%f\n", x);
 
   set_allowed_to_draw(FALSE);
 }
@@ -206,6 +269,11 @@ gboolean brush_color_changed (GtkWidget      *widget,
   gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &chosen_color);
   set_brush_color(chosen_color);
   return TRUE;
+}
+
+gboolean eraser_mode_enabled()
+{
+  return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(eraser_toggle_button));
 }
 
 void close_window ()

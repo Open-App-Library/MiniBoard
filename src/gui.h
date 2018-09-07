@@ -11,6 +11,14 @@ GtkWidget *get_canvas_widget();
 
 int init_gui(int *argc, char ***argv);
 
+gboolean save_as_button_clicked(GtkWidget      *widget,
+                                GdkEventButton *event,
+                                gpointer        data);
+
+gboolean save_button_clicked(GtkWidget      *widget,
+                             GdkEventButton *event,
+                             gpointer        data);
+
 gboolean button_press_event_cb (GtkWidget        *widget,
                                 GdkEventButton   *event,
                                 gpointer          data);
@@ -44,6 +52,8 @@ gboolean brush_size_changed (GtkWidget      *widget,
 gboolean brush_color_changed (GtkWidget      *widget,
                               GdkEventButton *event,
                               gpointer        data);
+
+gboolean eraser_mode_enabled();
 
 void close_window ();
 

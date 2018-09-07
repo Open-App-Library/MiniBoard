@@ -35,7 +35,12 @@ void draw_brush (GtkWidget *widget,
     if (x >= 0 && y >= 0 && x <= get_source_canvas_width() && y <= get_source_canvas_height()) {
       cairo_t *cr = cairo_create(get_source_canvas());
 
-      cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
+      if (eraser_mode_enabled()) {
+        cairo_set_source_rgb(cr, 1,1,1); // White color, same as background. This line will change when a canvas-background color feature is added
+      } else {
+        cairo_set_source_rgb(cr, brush_color_value.red, brush_color_value.green, brush_color_value.blue);
+      }
+
 
       cairo_arc(cr, x, y, brush_size_value / 2, 0, 2 * M_PI);
 
