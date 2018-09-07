@@ -7,6 +7,14 @@
 #include <gtk/gtk.h>
 #include <glib/gprintf.h>
 
+static GtkBuilder *builder;
+static GtkWidget  *app_window;
+static GtkWidget  *drawing_frame;
+static GtkWidget  *drawing_area;
+static GtkWidget  *brush_color_widget;
+static GtkWidget  *brush_size_widget;
+static GtkWidget  *actions_menu;
+
 static gdouble last_scale_value = 1.0;
 static gdouble current_scale_value = 1.0;
 
@@ -38,9 +46,9 @@ int init_gui(int *argc, char ***argv) {
   g_signal_connect (app_window, "destroy", G_CALLBACK (close_window), NULL);
 
   drawing_frame = GTK_WIDGET(gtk_builder_get_object(builder, "drawing_frame"));
-  button_new_widget    = GTK_WIDGET(gtk_builder_get_object(builder, "button_new"));
   brush_color_widget   = GTK_WIDGET(gtk_builder_get_object(builder, "brush_color"));
   brush_size_widget    = GTK_WIDGET(gtk_builder_get_object(builder, "brush_size"));
+  actions_menu         = GTK_WIDGET(gtk_builder_get_object(builder, "actions_menu"));
 
   drawing_area = gtk_drawing_area_new();
   gtk_container_add(GTK_CONTAINER(drawing_frame), drawing_area);
@@ -103,6 +111,9 @@ gboolean button_press_event_cb (GtkWidget      *widget,
   // paranoia check, in case we haven't gotten a configure event
   if (get_source_canvas() == NULL)
     return FALSE;
+
+  // If actions menu is open, close it
+  gtk_popover_popdown(GTK_POPOVER(actions_menu));
 
   if (event->button == GDK_BUTTON_PRIMARY) {
     draw_brush(widget, event->x, event->y);

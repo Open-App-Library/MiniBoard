@@ -3,14 +3,6 @@
 
 #include <gtk/gtk.h>
 
-static GtkBuilder *builder;
-static GtkWidget  *app_window;
-static GtkWidget  *drawing_frame;
-static GtkWidget  *drawing_area;
-static GtkWidget  *button_new_widget; // For creating new drawings
-static GtkWidget  *brush_color_widget;
-static GtkWidget  *brush_size_widget;
-
 GdkRGBA get_brush_color();
 int     get_brush_size();
 
