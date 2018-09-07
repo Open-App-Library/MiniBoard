@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/io/dougie/miniboard">
     <file preprocess="xml-stripblanks">design.glade</file>
-    <file preprocess="xml-stripblanks">gimp-tool-eraser.svg</file>
+    <file preprocess="xml-stripblanks">icons/gimp-tool-eraser.svg</file>
+    <file preprocess="xml-stripblanks">icons/gimp-tool-pan.svg</file>
   </gresource>
 </gresources>
