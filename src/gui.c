@@ -139,6 +139,11 @@ gboolean save_as_button_clicked (GtkWidget      *widget,
                                         "_Save",
                                         "_Cancel");
 
+  GtkFileFilter *pngfilter = gtk_file_filter_new();
+  gtk_file_filter_set_name(pngfilter, "PNG Image");
+  gtk_file_filter_add_pattern(pngfilter, "*.png");
+  gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(native), pngfilter);
+
   res = gtk_native_dialog_run (GTK_NATIVE_DIALOG (native));
   if (res == GTK_RESPONSE_ACCEPT)
     {
@@ -174,12 +179,6 @@ gboolean save_button_clicked (GtkWidget      *widget,
 }
 
 
-const gchar *get_filename_ext(const char *filename) {
-  const char *dot = strrchr(filename, '.');
-  if(!dot || dot == filename) return "";
-  return dot + 1;
-}
-
 gboolean open_button_clicked (GtkWidget      *widget,
                               GdkEventButton *event,
                               gpointer        data)
@@ -194,6 +193,11 @@ gboolean open_button_clicked (GtkWidget      *widget,
                                         "_Open",
                                         "_Cancel");
 
+  GtkFileFilter *pngfilter = gtk_file_filter_new();
+  gtk_file_filter_set_name(pngfilter, "PNG Image");
+  gtk_file_filter_add_pattern(pngfilter, "*.png");
+  gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(native), pngfilter);
+
   res = gtk_native_dialog_run (GTK_NATIVE_DIALOG (native));
   if (res == GTK_RESPONSE_ACCEPT)
     {
@@ -201,13 +205,8 @@ gboolean open_button_clicked (GtkWidget      *widget,
       GtkFileChooser *chooser = GTK_FILE_CHOOSER (native);
       filename = gtk_file_chooser_get_filename (chooser);
       active_filename = g_strconcat(filename, NULL); // essentially copies the point to active_filename
-      const gchar *ext = get_filename_ext(active_filename);
-      if (strcmp(ext, ".png")) {
-        printf("Loaded %s\n", active_filename);
-        set_canvas_from_png(filename);
-      } else {
-        printf("[Error] Unsupported filetype, '%s'\n", ext);
-      }
+      set_canvas_from_png(filename);
+      printf("Loaded %s\n", active_filename);
       // If actions menu is open, close it
       gtk_popover_popdown(GTK_POPOVER(actions_menu));
 

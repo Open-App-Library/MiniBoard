@@ -38,14 +38,25 @@ cairo_surface_t *get_user_canvas()
 
 int get_source_canvas_width()
 {
-  // TODO: Implement this function
-  return 1000;
+  cairo_t *cr;
+  double x1, x2, y1, y2;
+
+  cr = cairo_create (source_canvas);
+  cairo_clip_extents (cr, &x1, &y1, &x2, &y2);
+  cairo_destroy (cr);
+  return x2 - x1;
 }
 
 int get_source_canvas_height()
 {
-  // TODO: Implement this function
-  return 1000;
+  cairo_t *cr;
+  double x1, x2, y1, y2;
+
+  cr = cairo_create (source_canvas);
+  cairo_clip_extents (cr, &x1, &y1, &x2, &y2);
+  cairo_destroy (cr);
+
+  return y2 - y1;
 }
 
 int get_user_canvas_width()
