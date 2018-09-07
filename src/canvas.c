@@ -131,6 +131,26 @@ void clear_canvas ()
   clear_specific_canvas(user_canvas);
 }
 
+void reset_canvas()
+{
+  static cairo_surface_t *tmp_canvas;
+  tmp_canvas = gdk_window_create_similar_surface(gtk_widget_get_window(get_canvas_widget()),
+                                                 CAIRO_CONTENT_COLOR,
+                                                 CANVAS_WIDTH,
+                                                 CANVAS_HEIGHT);
+  cairo_t *cr;
+
+  // DRAW WHITE BACKGROUND
+  cr = cairo_create (tmp_canvas);
+  cairo_set_source_rgb (cr, 1, 1, 1);
+  cairo_paint (cr);
+  cairo_destroy (cr);
+
+
+  cairo_surface_destroy(source_canvas);
+  source_canvas = tmp_canvas;
+}
+
 void destroy_canvases()
 {
   cairo_surface_destroy(source_canvas);

@@ -29,7 +29,8 @@ cairo_surface_t *new_canvas_with_dimensions(int canvas_width, int canvas_height)
 
 void clear_specific_canvas(cairo_surface_t *canvas);
 
-void clear_canvas ();
+void clear_canvas();
+void reset_canvas(); // For creating new files
 
 void destroy_canvases();
 

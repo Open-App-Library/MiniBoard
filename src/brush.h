@@ -3,7 +3,7 @@
 #include <gtk/gtk.h>
 
 static GdkRGBA brush_color_value = {0,0,0,0};
-static int brush_size_value = 5;
+static int brush_size_value = 10;
 
 int last_draw_x;
 int last_draw_y;

@@ -89,6 +89,8 @@ int init_gui(int *argc, char ***argv) {
   g_signal_connect(brush_color_widget, "color-set",
                    G_CALLBACK(brush_color_changed), NULL);
 
+  g_signal_connect(new_button, "clicked",
+                   G_CALLBACK(new_button_clicked), NULL);
   g_signal_connect(open_button, "clicked",
                    G_CALLBACK(open_button_clicked), NULL);
   g_signal_connect(save_as_button, "clicked",
@@ -206,6 +208,7 @@ gboolean open_button_clicked (GtkWidget      *widget,
       filename = gtk_file_chooser_get_filename (chooser);
       active_filename = g_strconcat(filename, NULL); // essentially copies the point to active_filename
       set_canvas_from_png(filename);
+      gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), active_filename);
       printf("Loaded %s\n", active_filename);
       // If actions menu is open, close it
       gtk_popover_popdown(GTK_POPOVER(actions_menu));
@@ -214,6 +217,18 @@ gboolean open_button_clicked (GtkWidget      *widget,
     }
 
   g_object_unref (native);
+
+  return TRUE;
+}
+
+gboolean new_button_clicked(GtkWidget      *widget,
+                            GdkEventButton *event,
+                            gpointer        data)
+{
+  reset_canvas();
+  active_filename = NULL;
+  gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), "Untitled Drawing");
+  gtk_popover_popdown(GTK_POPOVER(actions_menu));
 
   return TRUE;
 }
