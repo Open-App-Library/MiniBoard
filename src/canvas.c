@@ -147,7 +147,7 @@ void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble 
   x_anchor = get_user_canvas_width() / 2 - CANVAS_WIDTH * scale_value / 2;
   y_anchor = get_user_canvas_height() / 2 - CANVAS_HEIGHT * scale_value / 2;
 
-  gtk_widget_queue_draw_area (get_canvas_widget(), 0, 0, get_user_canvas_width(), get_user_canvas_height());
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 gboolean source_canvas_exists()
@@ -158,6 +158,15 @@ gboolean source_canvas_exists()
 gboolean user_canvas_exists()
 {
   return user_canvas ? TRUE : FALSE;
+}
+
+void set_canvas_from_png(const gchar *filename)
+{
+  cairo_surface_t *new_surface;
+  new_surface = cairo_image_surface_create_from_png(filename);
+  cairo_surface_destroy(source_canvas);
+  source_canvas = new_surface;
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 gboolean allowed_to_draw()

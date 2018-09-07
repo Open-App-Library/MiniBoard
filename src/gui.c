@@ -10,9 +10,10 @@ static GtkBuilder *builder;
 static GtkWidget  *app_window;
 static GtkWidget  *drawing_frame;
 static GtkWidget  *drawing_area;
+
+static GtkWidget  *header_bar;
 static GtkWidget  *brush_color_widget;
 static GtkWidget  *brush_size_widget;
-
 static GtkWidget  *actions_menu;
 static GtkWidget  *new_button;
 static GtkWidget  *open_button;
@@ -23,7 +24,7 @@ static GtkWidget  *eraser_toggle_button;
 static gdouble last_scale_value = 1.0;
 static gdouble current_scale_value = 1.0;
 
-static gchar *active_filename;
+gchar *active_filename;
 
 GdkRGBA get_brush_color()
 {
@@ -53,6 +54,7 @@ int init_gui(int *argc, char ***argv) {
   g_signal_connect (app_window, "destroy", G_CALLBACK (close_window), NULL);
 
   drawing_frame = GTK_WIDGET(gtk_builder_get_object(builder, "drawing_frame"));
+  header_bar           = GTK_WIDGET(gtk_builder_get_object(builder, "header_bar"));
   brush_color_widget   = GTK_WIDGET(gtk_builder_get_object(builder, "brush_color"));
   brush_size_widget    = GTK_WIDGET(gtk_builder_get_object(builder, "brush_size"));
   actions_menu         = GTK_WIDGET(gtk_builder_get_object(builder, "actions_menu"));
@@ -87,6 +89,8 @@ int init_gui(int *argc, char ***argv) {
   g_signal_connect(brush_color_widget, "color-set",
                    G_CALLBACK(brush_color_changed), NULL);
 
+  g_signal_connect(open_button, "clicked",
+                   G_CALLBACK(open_button_clicked), NULL);
   g_signal_connect(save_as_button, "clicked",
                    G_CALLBACK(save_as_button_clicked), NULL);
   g_signal_connect(save_button, "clicked",
@@ -129,7 +133,7 @@ gboolean save_as_button_clicked (GtkWidget      *widget,
   GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_SAVE;
   gint res;
 
-  native = gtk_file_chooser_native_new ("Open File",
+  native = gtk_file_chooser_native_new ("Save File",
                                         GTK_WINDOW(app_window),
                                         action,
                                         "_Save",
@@ -142,14 +146,13 @@ gboolean save_as_button_clicked (GtkWidget      *widget,
       GtkFileChooser *chooser = GTK_FILE_CHOOSER (native);
       filename = gtk_file_chooser_get_filename (chooser);
       filename = g_strconcat(filename, ".png", NULL);
-      active_filename = filename;
+      active_filename = g_strconcat(filename, NULL); // essentially copies the point to active_filename
       save_button_clicked(widget, event, data);
 
       g_free (filename);
     }
 
   g_object_unref (native);
-
 
   return TRUE;
 }
@@ -162,11 +165,59 @@ gboolean save_button_clicked (GtkWidget      *widget,
     save_as_button_clicked(widget, event, data);
   } else {
     cairo_surface_write_to_png(get_source_canvas(), active_filename);
+    gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), active_filename);
     printf("File saved to %s\n", active_filename);
   }
+  // If actions menu is open, close it
+  gtk_popover_popdown(GTK_POPOVER(actions_menu));
   return TRUE;
 }
 
+
+const gchar *get_filename_ext(const char *filename) {
+  const char *dot = strrchr(filename, '.');
+  if(!dot || dot == filename) return "";
+  return dot + 1;
+}
+
+gboolean open_button_clicked (GtkWidget      *widget,
+                              GdkEventButton *event,
+                              gpointer        data)
+{
+  GtkFileChooserNative *native;
+  GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
+  gint res;
+
+  native = gtk_file_chooser_native_new ("Open File",
+                                        GTK_WINDOW(app_window),
+                                        action,
+                                        "_Open",
+                                        "_Cancel");
+
+  res = gtk_native_dialog_run (GTK_NATIVE_DIALOG (native));
+  if (res == GTK_RESPONSE_ACCEPT)
+    {
+      char *filename;
+      GtkFileChooser *chooser = GTK_FILE_CHOOSER (native);
+      filename = gtk_file_chooser_get_filename (chooser);
+      active_filename = g_strconcat(filename, NULL); // essentially copies the point to active_filename
+      const gchar *ext = get_filename_ext(active_filename);
+      if (strcmp(ext, ".png")) {
+        printf("Loaded %s\n", active_filename);
+        set_canvas_from_png(filename);
+      } else {
+        printf("[Error] Unsupported filetype, '%s'\n", ext);
+      }
+      // If actions menu is open, close it
+      gtk_popover_popdown(GTK_POPOVER(actions_menu));
+
+      g_free (filename);
+    }
+
+  g_object_unref (native);
+
+  return TRUE;
+}
 
 gboolean button_press_event_cb (GtkWidget      *widget,
                                 GdkEventButton *event,

@@ -19,6 +19,10 @@ gboolean save_button_clicked(GtkWidget      *widget,
                              GdkEventButton *event,
                              gpointer        data);
 
+gboolean open_button_clicked (GtkWidget      *widget,
+                              GdkEventButton *event,
+                              gpointer        data);
+
 gboolean button_press_event_cb (GtkWidget        *widget,
                                 GdkEventButton   *event,
                                 gpointer          data);

@@ -41,6 +41,8 @@ void set_scale_value_on_release(gdouble last_scale);
 gboolean source_canvas_exists();
 gboolean user_canvas_exists();
 
+void set_canvas_from_png();
+
 gboolean allowed_to_draw();
 void     set_allowed_to_draw(gboolean bool);
 
