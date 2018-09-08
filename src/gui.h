@@ -40,9 +40,21 @@ gboolean motion_notify_event_cb (GtkWidget      *widget,
                                  GdkEventMotion *event,
                                  gpointer        data);
 
+gboolean scroll_event_cb (GtkWidget *widget,
+                          GdkEventScroll  *event,
+                          gpointer   user_data);
+
 gboolean gesture_zoom_event (GtkGestureZoom *gesture,
                              gdouble         scale,
                              gpointer        user_data);
+
+gboolean key_press_cb (GtkWidget *widget,
+                       GdkEventKey  *event,
+                       gpointer   user_data);
+
+gboolean key_release_cb (GtkWidget *widget,
+                         GdkEventKey  *event,
+                         gpointer   user_data);
 
 void
 gesture_begin (GtkGesture       *gesture,

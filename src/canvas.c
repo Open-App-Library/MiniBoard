@@ -79,6 +79,26 @@ gdouble get_canvas_y_offset()
   return y_offset;
 }
 
+void set_canvas_x_offset(gdouble amt)
+{
+  x_offset = amt;
+}
+
+void set_canvas_y_offset(gdouble amt)
+{
+  y_offset = amt;
+}
+
+void add_to_canvas_x_offset(gdouble amt)
+{
+  x_offset += amt;
+}
+
+void add_to_canvas_y_offset(gdouble amt)
+{
+  y_offset += amt;
+}
+
 gdouble get_canvas_x_anchor()
 {
   return x_anchor;
@@ -157,13 +177,9 @@ void destroy_canvases()
   cairo_surface_destroy(user_canvas);
 }
 
-void scale_canvas(gdouble scale, gdouble x, gdouble y)
+void set_canvas_scale(gdouble scale)
 {
   scale_value = scale;
-  /* x_offset = x - CANVAS_WIDTH * scale * (x / get_user_canvas_width()); */
-  /* y_offset = y - CANVAS_HEIGHT * scale * (y / get_user_canvas_height()); */
-
-  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble y)

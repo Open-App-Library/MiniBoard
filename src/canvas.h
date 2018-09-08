@@ -18,6 +18,11 @@ int get_user_canvas_height();
 
 gdouble get_canvas_x_offset();
 gdouble get_canvas_y_offset();
+void    set_canvas_x_offset(gdouble amt);
+void    set_canvas_y_offset(gdouble amt);
+void    add_to_canvas_x_offset(gdouble amt);
+void    add_to_canvas_y_offset(gdouble amt);
+
 gdouble get_canvas_x_anchor();
 gdouble get_canvas_y_anchor();
 
@@ -34,7 +39,7 @@ void reset_canvas(); // For creating new files
 
 void destroy_canvases();
 
-void scale_canvas(gdouble scale, gdouble x, gdouble y);
+void set_canvas_scale(gdouble scale);
 void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble y);
 
 void set_scale_value_on_release(gdouble last_scale);

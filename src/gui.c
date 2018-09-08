@@ -24,6 +24,9 @@ static GtkWidget  *eraser_toggle_button;
 static gdouble last_scale_value = 1.0;
 static gdouble current_scale_value = 1.0;
 
+// Keyboard-related variables
+static gboolean control_key_is_down = FALSE;
+
 gchar *active_filename;
 
 GdkRGBA get_brush_color()
@@ -74,8 +77,15 @@ int init_gui(int *argc, char ***argv) {
                     G_CALLBACK (configure_event_cb), NULL);
 
   /* Event signals */
+  g_signal_connect (app_window, "key-press-event",
+                    G_CALLBACK (key_press_cb), NULL);
+  g_signal_connect (app_window, "key-release-event",
+                    G_CALLBACK (key_release_cb), NULL);
+
   g_signal_connect (drawing_area, "motion-notify-event",
                     G_CALLBACK (motion_notify_event_cb), NULL);
+  g_signal_connect (drawing_area, "scroll-event",
+                    G_CALLBACK (scroll_event_cb), NULL);
   g_signal_connect (drawing_area, "button-press-event",
                     G_CALLBACK (button_press_event_cb), NULL);
 
@@ -117,7 +127,8 @@ int init_gui(int *argc, char ***argv) {
                                      | GDK_BUTTON_PRESS_MASK
                                      | GDK_BUTTON_RELEASE_MASK
                                      | GDK_POINTER_MOTION_MASK
-                                     | GDK_TOUCH_MASK);
+                                     | GDK_TOUCH_MASK
+                                     | GDK_SCROLL_MASK);
 
 
   gtk_widget_show_all(GTK_WIDGET(app_window));
@@ -263,7 +274,6 @@ gboolean button_release_event_cb (GtkWidget      *widget,
   return TRUE;
 }
 
-
 gboolean
 motion_notify_event_cb (GtkWidget        *widget,
                         GdkEventMotion *event,
@@ -280,6 +290,43 @@ motion_notify_event_cb (GtkWidget        *widget,
   return TRUE;
 }
 
+gboolean scroll_event_cb (GtkWidget *widget,
+                          GdkEventScroll  *event,
+                          gpointer   user_data)
+{
+  gdouble scroll_speed = 10.0 * get_scale_value();
+  gdouble scale_amt    = 0.01;
+  gdouble dx = 0.0, dy = 0.0, ds=0.0; // ds means delta scale
+  switch (event->direction) {
+    case GDK_SCROLL_UP:
+      dy = scroll_speed;
+      ds = scale_amt;
+      break;
+    case GDK_SCROLL_DOWN:
+      dy = -scroll_speed;
+      ds = -scale_amt;
+      break;
+    case GDK_SCROLL_LEFT:
+      dx = -scroll_speed;
+      break;
+    case GDK_SCROLL_RIGHT:
+      dx = scroll_speed;
+      break;
+    default:
+      break;
+  }
+  // Zoom if the control key is held down. Otherwise pan the canvas.
+  if (control_key_is_down) {
+    gdouble newscale = get_scale_value() + ds;
+    set_canvas_scale(newscale);
+  } else {
+    add_to_canvas_x_offset(dx);
+    add_to_canvas_y_offset(dy);
+  }
+  gtk_widget_queue_draw(get_canvas_widget());
+  return TRUE;
+}
+
 gboolean gesture_zoom_event (GtkGestureZoom *gesture,
                              gdouble         scale,
                              gpointer        user_data)
@@ -290,6 +337,32 @@ gboolean gesture_zoom_event (GtkGestureZoom *gesture,
   scale_canvas_from(last_scale_value, scale, x, y);
   current_scale_value = scale;
 
+  return TRUE;
+}
+
+gboolean key_press_cb (GtkWidget *widget,
+                       GdkEventKey  *event,
+                       gpointer   user_data)
+{
+  switch (event->keyval) {
+  case 65507: // keycode for control key
+    control_key_is_down = TRUE;
+  default:
+    break;
+  }
+  return TRUE;
+}
+
+gboolean key_release_cb (GtkWidget *widget,
+                         GdkEventKey  *event,
+                         gpointer   user_data)
+{
+  switch (event->keyval) {
+  case 65507: // keycode for control key
+    control_key_is_down = FALSE;
+  default:
+    break;
+  }
   return TRUE;
 }
 
