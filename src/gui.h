@@ -75,6 +75,7 @@ gboolean brush_color_changed (GtkWidget      *widget,
                               gpointer        data);
 
 gboolean eraser_mode_enabled();
+gboolean pan_mode_enabled();
 
 void close_window ();
 

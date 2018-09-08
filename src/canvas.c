@@ -79,24 +79,30 @@ gdouble get_canvas_y_offset()
   return y_offset;
 }
 
-void set_canvas_x_offset(gdouble amt)
+void set_canvas_offset(gdouble xoff, gdouble yoff)
 {
-  x_offset = amt;
+  x_offset = xoff;
+  y_offset = yoff;
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
-void set_canvas_y_offset(gdouble amt)
+void add_to_canvas_offset(gdouble xamt, gdouble yamt)
 {
-  y_offset = amt;
+  x_offset += xamt;
+  y_offset += yamt;
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 void add_to_canvas_x_offset(gdouble amt)
 {
   x_offset += amt;
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 void add_to_canvas_y_offset(gdouble amt)
 {
   y_offset += amt;
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 gdouble get_canvas_x_anchor()
@@ -180,6 +186,7 @@ void destroy_canvases()
 void set_canvas_scale(gdouble scale)
 {
   scale_value = scale;
+  gtk_widget_queue_draw(get_canvas_widget());
 }
 
 void scale_canvas_from(gdouble scale_from, gdouble scale_to, gdouble x, gdouble y)

@@ -18,10 +18,8 @@ int get_user_canvas_height();
 
 gdouble get_canvas_x_offset();
 gdouble get_canvas_y_offset();
-void    set_canvas_x_offset(gdouble amt);
-void    set_canvas_y_offset(gdouble amt);
-void    add_to_canvas_x_offset(gdouble amt);
-void    add_to_canvas_y_offset(gdouble amt);
+void    set_canvas_offset(gdouble xoff, gdouble yoff);
+void    add_to_canvas_offset(gdouble xamt, gdouble yamt);
 
 gdouble get_canvas_x_anchor();
 gdouble get_canvas_y_anchor();

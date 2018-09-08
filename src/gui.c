@@ -20,12 +20,19 @@ static GtkWidget  *open_button;
 static GtkWidget  *save_button;
 static GtkWidget  *save_as_button;
 static GtkWidget  *eraser_toggle_button;
+static GtkWidget  *pan_toggle_button;
+
+static gdouble mouse_start_location_x;
+static gdouble mouse_start_location_y;
+static gdouble last_x_offset_value = 0.0;
+static gdouble last_y_offset_value = 0.0;
 
 static gdouble last_scale_value = 1.0;
 static gdouble current_scale_value = 1.0;
 
-// Keyboard-related variables
+// Keyboard/Mouse-related variables
 static gboolean control_key_is_down = FALSE;
+static gboolean left_mouse_button_is_down = FALSE;
 
 gchar *active_filename;
 
@@ -66,6 +73,7 @@ int init_gui(int *argc, char ***argv) {
   save_button          = GTK_WIDGET(gtk_builder_get_object(builder, "save_button"));
   save_as_button       = GTK_WIDGET(gtk_builder_get_object(builder, "save_as_button"));
   eraser_toggle_button = GTK_WIDGET(gtk_builder_get_object(builder, "eraser_toggle_button"));
+  pan_toggle_button    = GTK_WIDGET(gtk_builder_get_object(builder, "pan_toggle_button"));
 
   drawing_area = gtk_drawing_area_new();
   gtk_container_add(GTK_CONTAINER(drawing_frame), drawing_area);
@@ -256,7 +264,14 @@ gboolean button_press_event_cb (GtkWidget      *widget,
   gtk_popover_popdown(GTK_POPOVER(actions_menu));
 
   if (event->button == GDK_BUTTON_PRIMARY) {
-    draw_brush(widget, event->x, event->y);
+    left_mouse_button_is_down = TRUE;
+    mouse_start_location_x = event->x;
+    mouse_start_location_y = event->y;
+    last_x_offset_value = get_canvas_x_offset();
+    last_y_offset_value = get_canvas_y_offset();
+    if (!pan_mode_enabled()) {
+      draw_brush(widget, event->x, event->y);
+    }
   } else if (event->button == GDK_BUTTON_SECONDARY) {
     /* clear_canvas(); */
     gtk_widget_queue_draw(widget);
@@ -271,6 +286,9 @@ gboolean button_release_event_cb (GtkWidget      *widget,
                                   gpointer        data)
 {
   stroke_release();
+  if (event->button == GDK_BUTTON_PRIMARY) {
+    left_mouse_button_is_down = FALSE;
+  }
   return TRUE;
 }
 
@@ -283,8 +301,14 @@ motion_notify_event_cb (GtkWidget        *widget,
   if (get_source_canvas() == NULL)
     return FALSE;
 
-  if (event->state & GDK_BUTTON1_MASK)
-    draw_brush (widget, event->x, event->y);
+  if (event->state & GDK_BUTTON1_MASK) {
+    if (pan_mode_enabled()) {
+      set_canvas_offset(last_x_offset_value + (event->x - mouse_start_location_x),
+                        last_y_offset_value + (event->y - mouse_start_location_y));
+    } else {
+      draw_brush (widget, event->x, event->y);
+    }
+  }
 
   /* We've handled it, stop processing */
   return TRUE;
@@ -320,10 +344,8 @@ gboolean scroll_event_cb (GtkWidget *widget,
     gdouble newscale = get_scale_value() + ds;
     set_canvas_scale(newscale);
   } else {
-    add_to_canvas_x_offset(dx);
-    add_to_canvas_y_offset(dy);
+    add_to_canvas_offset(dx, dy);
   }
-  gtk_widget_queue_draw(get_canvas_widget());
   return TRUE;
 }
 
@@ -412,6 +434,11 @@ gboolean brush_color_changed (GtkWidget      *widget,
 gboolean eraser_mode_enabled()
 {
   return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(eraser_toggle_button));
+}
+
+gboolean pan_mode_enabled()
+{
+  return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pan_toggle_button));
 }
 
 void close_window ()
